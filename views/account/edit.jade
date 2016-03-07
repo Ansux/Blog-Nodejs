@@ -1,0 +1,36 @@
+extends ../layout
+block style
+    style.
+        .center-box{width:400px;margin:200px auto;}
+block content
+    .center-box
+        .panel.panel-default
+            .panel-heading 信息变更 #{account.uid}
+            .panel-body
+                form.form-horizontal(method='post',action='/account/edit')
+                    if account
+                        input(type='hidden',name='account[_id]',value=account._id)
+                    .form-group
+                        label.col-md-2.control-label 姓名
+                        .col-md-10
+                            input.form-control(name='account[fullname]',value=account.fullname)
+                    .form-group
+                        label.col-md-2.control-label 邮箱
+                        .col-md-10
+                            input.form-control(name='account[email]',value=account.email)
+                    
+                    .form-group
+                        label.col-md-2.control-label 等级
+                        .col-md-10
+                            select.form-control(name='account[level]')
+                                option(value='1',selected=account.level==1) 普通用户
+                                option(value='6',selected=account.level==6) 管理员
+                    .form-group
+                        label.col-md-2.control-label 启用
+                        .col-md-10
+                            .checkbox
+                                label
+                                    input(type='checkbox',name='account[enable]',value=account.enable,checked=account.enable)
+                    .form-group
+                        .col-md-offset-2.col-md-10
+                            button.btn.btn-danger(type='submit') 提交信息

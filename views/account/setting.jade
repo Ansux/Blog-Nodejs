@@ -1,0 +1,36 @@
+extends ../layout
+block style
+    style.
+        .center-box{width:400px;margin:200px auto;}
+block content
+    .center-box
+        .panel.panel-default
+            .panel-heading 信息变更 #{account.uid}
+            .panel-body
+                form.form-horizontal(method='post',action='/account/setting')
+                    if account
+                        input(type='hidden',name='account[_id]',value=account._id)
+                    .form-group
+                        label.col-md-2.control-label 姓名
+                        .col-md-10
+                            input.form-control(name='account[fullname]',value=account.fullname)
+                    .form-group
+                        label.col-md-2.control-label 性别
+                        .col-md-10
+                            label.radio-inline
+                                input(type="radio",name="account[sex]",value="1",checked=account.sex==1)
+                                | 男
+                            label.radio-inline
+                                input(type="radio",name="account[sex]",value="0",checked=account.sex==0)
+                                | 女
+                    .form-group
+                        label.col-md-2.control-label 年龄
+                        .col-md-10
+                            input.form-control(name='account[age]',value=account.age)
+                    .form-group
+                        label.col-md-2.control-label 邮箱
+                        .col-md-10
+                            input.form-control(name='account[email]',value=account.email)
+                    .form-group
+                        .col-md-offset-2.col-md-10
+                            button.btn.btn-danger(type='submit') 提交信息

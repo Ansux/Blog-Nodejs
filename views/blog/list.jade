@@ -1,0 +1,33 @@
+extends ../layout
+block content
+    table.table
+        thead
+            tr
+                th 名称
+                th 栏目
+                th 图片
+                th 作者
+                th 时间
+                th 操作
+        tbody
+            each item in blogs
+                tr
+                    td= item.title
+                    td= item.category.name
+                    td= item.thumb
+                    td= item.account.uid
+                    td= moment(item.meta.createAt).format('YYYY-MM-DD')
+                    td
+                        a.btn.btn-primary(href='/blog/#{item._id}') 查看
+                        a.btn.btn-warning(href='/blog/edit/#{item._id}') 编辑
+                        a.btn.btn-danger(href='#',data-id='#{item._id}') 删除
+    script.
+        $('.btn-danger').click(function(){
+            var id = $(this).attr('data-id');
+            var This = this;
+            $.post('/blog/remove',{id:id},function(res){
+                if(res.success){
+                    $(This).parents('tr').remove();
+                }
+            });
+        });

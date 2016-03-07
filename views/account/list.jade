@@ -1,0 +1,38 @@
+extends ../layout
+block content
+    table.table
+        thead
+            tr
+                th 账号
+                th 级别
+                th 姓名
+                th 性别
+                th 年龄
+                th 邮箱
+                th 启用
+                th 创建时间
+                th 操作
+        tbody
+            each item in accounts
+                tr
+                    td= item.uid
+                    td
+                        if item.level==1
+                            | 普通用户
+                        else if item.level==6
+                            | 管理员
+                        else if item.level==9
+                            | 超管
+                    td= item.fullname
+                    td
+                        if item.sex==1
+                            | 男
+                        else
+                            | 女
+                    td= item.age
+                    td= item.email
+                    td
+                        input(type='checkbox',disabled,checked=item.enable)
+                    td= moment(item.meta.createAt).format('YYYY-MM-DD')
+                    td
+                        a(href='/account/edit/#{item._id}') 编辑

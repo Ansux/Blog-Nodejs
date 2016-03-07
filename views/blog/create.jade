@@ -1,0 +1,32 @@
+extends ../layout
+block content
+    form.form-horizontal(method='post',action='/blog/save')
+        if blog._id
+            input(type='hidden',name='blog[_id]',value=blog._id)
+        .form-group
+            label.col-sm-2.control-label 名称
+            .col-sm-10
+                input.form-control(name='blog[title]',value=blog.title)
+        .form-group
+            label.col-sm-2.control-label 栏目
+            .col-sm-10
+                each cate in categories
+                    label.radio-inline
+                        if blog._id && blog.category
+                            input(type='radio',name='blog[category]',value=cate._id,checked=cate._id.toString()==blog.category.toString())
+                            | #{cate.name}
+                        else
+                            input(type='radio',name='blog[category]',value=cate._id)
+                            | #{cate.name}
+        .form-group
+            label.col-sm-2.control-label 图片
+            .col-sm-10
+                input.form-control(name='blog[thumb]',value=blog.thumb)
+        .form-group
+            label.col-sm-2.control-label 内容
+            .col-sm-10
+                textarea.form-control(name='blog[content]') #{blog.content}
+        .form-group
+            .col-sm-offset-2.col-sm-10
+                button.btn.btn-primary(type='submit') 保存
+                

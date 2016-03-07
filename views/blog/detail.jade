@@ -1,0 +1,14 @@
+extends ../layout
+block content
+    dl.dl-horizontal
+        dt 标题
+        dd= blog.title
+        dt 栏目
+        dd= blog.category.name
+        dt 图片
+        dd= blog.thumb
+        dt 内容
+        dd= blog.content
+        dt
+        dd
+            a(href('/blog/edit/#{blog._id}')) 编辑

@@ -1,0 +1,10 @@
+extends ../layout
+block content
+    dl.dl-horizontal
+        dt 名称
+        dd= category.name
+        dt 时间
+        dd= moment(category.meta.createAt).format('YYYY-MM-DD')
+        dt 操作
+        dd
+            a.btn.btn-danger(href="/category/edit/#{category._id}") 编辑
