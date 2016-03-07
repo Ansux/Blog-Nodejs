@@ -1,25 +1,63 @@
 extends ../layout
 block style
-    style.
-        .center-box{width:400px;margin:200px auto;}
+  style.
+    .center-box {
+      width: 400px;
+      margin: 200px auto;
+    }
 block content
-    .center-box
-        .panel.panel-default
-            .panel-heading 用户注册
-                .panel-body
-                    form.form-horizontal(method='post',action='/account/signup')
-                        .form-group
-                            label.col-md-2.control-label 账号
-                            .col-md-10
-                                input.form-control(name='account[uid]')
-                        .form-group
-                            label.col-md-2.control-label 密码
-                            .col-md-10
-                                input.form-control(type='password',name='account[upwd]')
-                        .form-group
-                            label.col-md-2.control-label 邮箱
-                            .col-md-10
-                                input.form-control(name='account[email]')
-                        .form-group
-                            .col-md-offset-2.col-md-10
-                                button.btn.btn-danger(type='submit') 立即注册
+  .center-box(ng-app='myApp')
+    .panel.panel-default(ng-controller='myAg')
+      .panel-heading 用户注册
+      .panel-body
+        form.form-horizontal(name='myForm',ng-submit='submit()',novalidate)
+          .form-group(ng-class="{'has-error':(myForm.uid.$dirty&&myForm.uid.$invalid)||exist}")
+            label.col-md-2.control-label 账号
+            .col-md-10
+              input.form-control(name='uid',ng-model='account.uid',ng-blur='checkExist()',required)
+          .form-group(ng-class="{'has-error':(myForm.upwd.$dirty&&myForm.upwd.$invalid)}")
+            label.col-md-2.control-label 密码
+            .col-md-10
+              input.form-control(name='upwd',type='password',ng-model='account.upwd',required)
+          .form-group(ng-class="{'has-error':(myForm.pwd.$dirty&&account.upwd!=confirmPwd)}")
+            label.col-md-2.control-label 确认密码
+            .col-md-10
+              input.form-control(type='password',ng-model='confirmPwd',name='pwd')
+          .form-group(ng-class="{'has-error':(myForm.email.$dirty&&myForm.email.$invalid)}")
+            label.col-md-2.control-label 邮箱
+            .col-md-10
+              input.form-control(name='email',type='email',ng-model='account.email',required)
+          .form-group
+            .col-md-offset-2.col-md-10
+              button.btn.btn-danger(type='submit',ng-disabled='myForm.$invalid||exist') 立即注册
+block script
+  script.
+    var app = angular.module('myApp',[]);
+    app.controller('myAg',['$scope','$http',function($scope,$http){
+      $scope.account = {
+        uid:'',
+        upwd:'',
+        email:'',
+      };
+      var account = $scope.account,
+              postCfg = {
+                headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
+                transformRequest: function (data) {
+                  return $.param(data);
+                }
+              };
+      $scope.checkExist = function(){
+        $http.post('/account/exist',{uid:$scope.account.uid},postCfg).success(function(res){
+          $scope.exist = res ? true : false;
+        });
+      }
+      $scope.submit = function(){
+        $http.post('/account/signup',{account:account},postCfg).success(function(res){
+          if(res.status){
+            location.href = '/';
+          }else{
+            alert(res.msg);
+          }
+        });
+      }
+    }]);

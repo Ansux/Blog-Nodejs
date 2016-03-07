@@ -13,9 +13,14 @@ exports.post_signup = function (req, res) {
   var account = new Account(accountForm);
   account.save(function (err, acc) {
     if (err) {
-      console.log(err);
+      res.json({
+        status: false,
+        msg: err
+      });
     } else {
-      res.redirect('/');
+      res.json({
+        status: true
+      });
     }
   });
 };
@@ -35,13 +40,21 @@ exports.post_signin = function (req, res) {
     enable: true
   }, function (err, account) {
     if (err) {
-      return res.redirect('/account/signin');
+      res.json({
+        status: false,
+        msg: '登录错误！'
+      });
     } else {
       if (account) {
         req.session.account = account;
-        res.redirect('/');
+        res.json({
+          status: true
+        });
       } else {
-        res.redirect('/account/signin');
+        res.json({
+          status: false,
+          msg: '用户名和密码不匹配！'
+        });
       }
     }
   });
@@ -75,9 +88,14 @@ exports.post_setting = function (req, res) {
       _account = _.extend(account, accountForm);
       _account.save(function (err, a) {
         if (err) {
-          console.log(err);
+          return res.json({
+            status: false,
+            msg: '更新失败！'
+          });
         }
-        res.redirect('/');
+        res.json({
+          status: true
+        });
       });
     });
   }
@@ -99,9 +117,17 @@ exports.require_admin = function (req, res, next) {
   next();
 }
 
+exports.is_signin = function(req,res,next){
+  var account = req.session.account;
+  if(account){
+    return res.redirect('/');
+  }
+  next();
+}
+
 exports.get_list = function (req, res) {
   Account
-    .find({uid:{$ne:'sa'}})
+    .find({uid: {$ne: 'sa'}})
     .exec(function (err, accounts) {
       res.render('account/list', {
         title: '用户列表',
@@ -136,5 +162,19 @@ exports.post_edit = function (req, res) {
         res.redirect('/account/list');
       });
     })
+  }
+}
+
+exports.post_exist = function (req, res) {
+  var uid = req.body.uid;
+  if (uid) {
+    Account.findOne({uid: uid})
+      .exec(function (err, account) {
+        if (account) {
+          res.json(true);
+        } else {
+          res.json(false);
+        }
+      });
   }
 }

@@ -1,36 +1,70 @@
 extends ../layout
 block style
-    style.
-        .center-box{width:400px;margin:200px auto;}
+  style.
+    .center-box {
+      width: 400px;
+      margin: 200px auto;
+    }
 block content
-    .center-box
-        .panel.panel-default
-            .panel-heading 信息变更 #{account.uid}
-            .panel-body
-                form.form-horizontal(method='post',action='/account/setting')
-                    if account
-                        input(type='hidden',name='account[_id]',value=account._id)
-                    .form-group
-                        label.col-md-2.control-label 姓名
-                        .col-md-10
-                            input.form-control(name='account[fullname]',value=account.fullname)
-                    .form-group
-                        label.col-md-2.control-label 性别
-                        .col-md-10
-                            label.radio-inline
-                                input(type="radio",name="account[sex]",value="1",checked=account.sex==1)
-                                | 男
-                            label.radio-inline
-                                input(type="radio",name="account[sex]",value="0",checked=account.sex==0)
-                                | 女
-                    .form-group
-                        label.col-md-2.control-label 年龄
-                        .col-md-10
-                            input.form-control(name='account[age]',value=account.age)
-                    .form-group
-                        label.col-md-2.control-label 邮箱
-                        .col-md-10
-                            input.form-control(name='account[email]',value=account.email)
-                    .form-group
-                        .col-md-offset-2.col-md-10
-                            button.btn.btn-danger(type='submit') 提交信息
+  .center-box(ng-app='myApp')
+    .panel.panel-default(ng-controller='myAg')
+      .panel-heading 信息变更 #{account.uid}
+      .panel-body
+        form.form-horizontal(novalidate,name='myForm',ng-submit="submit()")
+          if account
+            input(type='hidden',name='_id',ng-model='account._id')
+          .form-group(ng-class="{'has-error':myForm.fullname.$dirty&&myForm.fullname.$invalid}")
+            label.col-md-2.control-label 姓名
+            .col-md-10
+              input.form-control(name='fullname', ng-model='account.fullname',required)
+          .form-group
+            label.col-md-2.control-label 性别
+            .col-md-10
+              label.radio-inline
+                input(type="radio",name="sex",value="1",ng-model='account.sex', ng-checked='account.sex==1')
+                | 男
+              label.radio-inline
+                input(type="radio",name="sex",value="0",ng-model='account.sex', ng-checked='account.sex==0')
+                | 女
+          .form-group(ng-class="{'has-error':myForm.age.$dirty&&myForm.age.$invalid}")
+            label.col-md-2.control-label 年龄
+            .col-md-10
+              input.form-control(type='number',name='age',min=1,max=120, ng-model='account.age')
+          .form-group(ng-class="{'has-error':myForm.email.$dirty&&myForm.email.$invalid}")
+            label.col-md-2.control-label 邮箱
+            .col-md-10
+              input.form-control(type='email',name='email',ng-model='account.email', required)
+          .form-group
+            .col-md-offset-2.col-md-10
+              button.btn.btn-danger(type='submit',ng-disabled='myForm.$invalid') 提交信息
+block script
+  script.
+    var app = angular.module('myApp', []);
+    app.controller('myAg', ['$scope', '$http', function ($scope, $http) {
+      $scope.account = {
+        _id: '#{account._id}',
+        fullname: '#{account.fullname}',
+        sex: #{account.sex},
+        age: #{account.age},
+        email: '#{account.email}'
+      }
+
+      $scope.submit = function () {
+        var account = $scope.account,
+                postCfg = {
+                  headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
+                  transformRequest: function (data) {
+                    return $.param(data);
+                  }
+                };
+        $http.post('/account/setting', {account: account}, postCfg)
+                .success(function (res) {
+                  if (res.status) {
+                    location.href = '/';
+                  } else {
+                    alert(res.msg);
+                  }
+                });
+      };
+
+    }]);

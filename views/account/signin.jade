@@ -1,24 +1,50 @@
 extends ../layout
 block style
-    style.
-        .center-box{width:400px;margin:200px auto;}
+  style.
+    .center-box {
+      width: 400px;
+      margin: 200px auto;
+    }
 block content
-    .center-box
-        .panel.panel-default
-            .panel-heading 用户登录
-            .panel-body
-                form.form-horizontal(method='post',action='/account/signin')
-                    .form-group
-                        label.col-md-2.control-label 账号
-                        .col-md-10
-                            input.form-control(name='account[uid]')
-                    .form-group
-                        label.col-md-2.control-label 密码
-                        .col-md-10
-                            input.form-control(type='password',name='account[upwd]')
-                    .form-group
-                        .col-md-offset-2.col-md-10
-                            button.btn.btn-danger(type='submit') 立即登录
+  .center-box(ng-app='myApp')
+    .panel.panel-default(ng-controller='myAngular')
+      .panel-heading 用户登录
+      .panel-body
+        form.form-horizontal(name='myForm',ng-submit="submit()", novalidate)
+          .form-group(ng-class="{'has-error':myForm.uid.$dirty && myForm.uid.$invalid}")
+            label.col-md-2.control-label 账号
+            .col-md-10
+              input.form-control(type='text',name='uid',ng-model="uid",required)
+          .form-group(ng-class="{'has-error':myForm.upwd.$dirty && myForm.upwd.$invalid}")
+            label.col-md-2.control-label 密码
+            .col-md-10
+              input.form-control(type='password',name='upwd',ng-model='upwd',required)
+          .form-group
+            .col-md-offset-2.col-md-10
+              button.btn.btn-danger(type='submit',ng-disabled="myForm.$invalid") 立即登录
 block script
-    script.
-        var a = 'k';
+  script.
+    var app = angular.module('myApp', []);
+    app.controller('myAngular', ['$scope', '$http', function ($scope, $http) {
+      $scope.submit = function () {
+        var account = {
+          uid: $scope.uid,
+          upwd: $scope.upwd
+        },
+        postCfg = {
+          headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
+          transformRequest: function (data) {
+            return $.param(data);
+          }
+        };
+        $http.post('/account/signin', {account:account}, postCfg)
+                .success(function (res) {
+                  if (res.status) {
+                    location.href = '/';
+                  } else {
+                    $scope.msg = res.msg;
+                    alert(res.msg);
+                  }
+                });
+      }
+    }]);
